@@ -1,9 +1,10 @@
+import { setTimeout } from "core-js";
+
 const modals = () => {
     function bindModal(triggerSelector, modalSelector, closeSelector) {
         const trigger = document.querySelectorAll(triggerSelector),
                 modal = document.querySelector(modalSelector),
                 close = document.querySelector(closeSelector);
-
 
             trigger.forEach(item => {
                 item.addEventListener('click', (e) => {
@@ -12,14 +13,11 @@ const modals = () => {
                     }
                     modal.style.display = 'block';
                     document.body.classList.add('modal-open');
+
+                    clearInterval(modalTimerId);
                    
                  });
             });
-
-            function openModal() {
-                modal.style.display = 'block';
-                document.body.classList.add('modal-open');
-            }
 
          close.addEventListener('click', () => {
             modal.style.display = 'none';
@@ -35,17 +33,18 @@ const modals = () => {
          });
          
         }
-        function showModalByTime(selector, time) {
-            setTimeout(function() {
-                document.querySelector(selector).style.display = 'block';
-                document.body.classList.add('modal-open');
-            }, time);
-        }
+            let modalTimerId;
+            function showModalByTime(selector, time) {
+               modalTimerId = setTimeout(function () {
+                    document.querySelector(selector).style.display = 'block';
+                    document.body.classList.add('modal-open');
+                }, time);
 
+           }
 
     bindModal('.popup_engineer_btn', '.popup_engineer', '.popup_engineer .popup_close');
     bindModal('.phone_link', '.popup', '.popup .popup_close');
-    // showModalByTime('.popup', 70000);
+    showModalByTime('.popup', 7000);
 };
 
 export default modals;
