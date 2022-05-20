@@ -1,13 +1,11 @@
-const forms = () => {
-    const form = document.querySelectorAll('form'),
-            inputs = document.querySelectorAll('input'),
-            phoneInputs = document.querySelectorAll('input[name="user_phone"]');
+import checkNumInputs from './checkNumInputs';
 
-    phoneInputs.forEach(item => {                                              // проверка на НЕ цифры
-        item.addEventListener('input', () => {
-            item.value = item.value.replace(/\D/, '');                         // удаляем НЕ цифры
-        });
-    });       
+const forms = (state) => {
+    const form = document.querySelectorAll('form'),
+          inputs = document.querySelectorAll('input'),
+          windows = document.querySelectorAll("[data-modal]");
+
+    checkNumInputs('input[name="user_phone"]');                                // проверка на НЕ цифры
 
     const message = {
         loading: 'Загрузка...',
@@ -26,13 +24,13 @@ const forms = () => {
     };
 
     const clearInputs = () => {                                              //  очистка inputs
-            inputs.forEach(item => {
-                item.value ='';
-            });
+        inputs.forEach(item => {
+            item.value ='';
+        });
     };
 
-
-    form.forEach(item => {                                                  // перебираем все формы
+    form.forEach(item => {                                               // перебираем все формы
+                                                                         
         item.addEventListener('submit', (e) =>{                             // навешиваем обработчик событий           
             e.preventDefault();
 
@@ -40,7 +38,14 @@ const forms = () => {
             statusMessage.classList.add('status');
             item.append(statusMessage);
 
-            const formData = new FormData(item);                        // собираем все введенные данные из форм
+            const formData = new FormData(item);                      // собираем все введенные данные из форм
+                
+
+            if (item.getAttribute('data-calc') === 'end'){            // для последней формы, добавляем поля из modalState (тип, ширина,высота и тд)...
+                for (let key in state) {
+                    formData.append(key, state[key]);                 // ... и добавляем в formData 
+                }
+            }
 
             postData('assets/server.php', formData)                     // отправляем запрос на сервер
                 .then(res => {
@@ -52,11 +57,21 @@ const forms = () => {
                     clearInputs();
                     setTimeout(() => {
                         statusMessage.remove();
-                    }, 5000);
+                        for (let key in state) {                          // очищаем modalState
+                            delete state[key];
+                        }
+                        windows.forEach(item => {
+                            item.style.display = "";                     // удаляем модалку
+                        });
+                        document.body.classList.remove('modal-open');      // активируем скролл
+                        console.log("Форма отправлена.");
+                        console.log(state);
+                    }, 4000);
                 });
-
+                
+            });
+        
         });
-    });
-};
-
+    };
+    
 export default forms;
