@@ -16,13 +16,13 @@ const timer = (id, deadline) => {
             hours = Math.floor((time/(1000 * 60 * 60)) % 24),
             days = Math.floor(time/(1000 * 60 * 60 * 24));
 
-    return {
-    'total': timer,
-    'days': days,
-    'hours': hours,
-    'minutes': minutes,
-    'seconds': seconds
-    };
+        return {
+        'total': timer,
+        'days': days,
+        'hours': hours,
+        'minutes': minutes,
+        'seconds': seconds
+        };
     };
 
     const setClock = (selector, endtime) => {
@@ -44,6 +44,11 @@ const timer = (id, deadline) => {
             seconds.textContent = addZero(t.seconds);
 
             if (t.total <= 0) {
+                days.textContent = "00";
+                hours.textContent = "00";
+                minutes.textContent = "00";
+                seconds.textContent = "00";
+                
                 clearInterval(timeInterval);
             }
         }
