@@ -178,13 +178,6 @@ textarea:focus {
   background-size: 70%;
 }
 
-.show {
-  display: block
-}
-
-.hide {
-  display: none
-}
 
 /*Header*/
 .header {
