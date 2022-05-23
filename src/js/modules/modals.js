@@ -32,13 +32,13 @@ const modals = (state) => {
                     const messageDiv = document.createElement('div');
 
                     messageDiv.classList.add('status');
-                    messageDiv.style.paddingTop = '20px';
+                    messageDiv.style.paddingTop = '30px';
       
                     if (e.target.classList.contains('popup_calc_button')) {
                         if(!state.width || !state.height) {
-                            modalCalcValid.appendChild(messageDiv);
+                            modalCalcValid.append(messageDiv);
                             messageDiv.textContent = messageAlert;
-                            e.target.style.opacity = '0.5';
+                            e.target.style.opacity = '0.7';
                             setTimeout(() => {
                                 messageDiv.remove();  
                                 e.target.style.opacity = '1';
@@ -48,9 +48,9 @@ const modals = (state) => {
                     }
                     if (e.target.classList.contains('popup_calc_profile_button')) {
                         if(!state.profile) {
-                            modalProfileValid.appendChild(messageDiv);
+                            modalProfileValid.append(messageDiv);
                             messageDiv.textContent = messageAlert;
-                            e.target.style.opacity = '0.5';
+                            e.target.style.opacity = '0.7';
                             setTimeout(() => {
                                 messageDiv.remove();  
                                 e.target.style.opacity = '1';
