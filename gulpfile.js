@@ -5,12 +5,14 @@ const webpack = require("webpack-stream");
 const browsersync = require("browser-sync");
 
 const dist = "./dist/";
+// const dist = "C:/Program Files/OpenServer/domains/test";
 
 gulp.task("copy-html", () => {
     return gulp.src("./src/index.html")
                 .pipe(gulp.dest(dist))
                 .pipe(browsersync.stream());
 });
+
 
 gulp.task("build-js", () => {
     return gulp.src("./src/js/main.js")
