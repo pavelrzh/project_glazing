@@ -61,9 +61,10 @@ const forms = (state) => {
                             delete state[key];
                         }
                         windows.forEach(item => {
-                            item.style.display = "";                     // удаляем модалку
+                            item.style.display = "none";                     // скрываем модалку
+                            document.body.style.overflow = '';
+                            document.body.style.marginRight = '0px';     // компенсируем скролл
                         });
-                        document.body.classList.remove('modal-open');      // активируем скролл
                         console.log("Форма отправлена.");
                         console.log(state);
                     }, 4000);
