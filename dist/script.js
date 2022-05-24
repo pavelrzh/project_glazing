@@ -33501,14 +33501,27 @@ window.addEventListener('DOMContentLoaded', function () {
     profile: ''
   };
   var deadLine = '2022-10-12';
+
+  var calcScroll = function calcScroll() {
+    var div = document.createElement('div');
+    div.style.width = '50px';
+    div.style.height = '50px';
+    div.style.overflowY = 'scroll';
+    div.style.visibility = 'hidden';
+    document.body.append(div);
+    var scrollWidth = div.offsetWidth - div.clientWidth;
+    div.remove();
+    return scrollWidth;
+  };
+
   Object(_modules_changeModalState__WEBPACK_IMPORTED_MODULE_4__["default"])(modalState);
-  Object(_modules_modals__WEBPACK_IMPORTED_MODULE_1__["default"])(modalState);
+  Object(_modules_modals__WEBPACK_IMPORTED_MODULE_1__["default"])(modalState, calcScroll);
   Object(_modules_tabs__WEBPACK_IMPORTED_MODULE_2__["default"])('.glazing_slider', '.glazing_block', '.glazing_content', 'active');
   Object(_modules_tabs__WEBPACK_IMPORTED_MODULE_2__["default"])('.decoration_slider', '.no_click', '.decoration_content > div > div', 'after_click');
   Object(_modules_tabs__WEBPACK_IMPORTED_MODULE_2__["default"])('.balcon_icons', '.balcon_icons_img', '.big_img > img', 'do_image_more', 'inline-block');
   Object(_modules_forms__WEBPACK_IMPORTED_MODULE_3__["default"])(modalState);
   Object(_modules_timer__WEBPACK_IMPORTED_MODULE_5__["default"])('.container1', deadLine);
-  Object(_modules_images__WEBPACK_IMPORTED_MODULE_6__["default"])();
+  Object(_modules_images__WEBPACK_IMPORTED_MODULE_6__["default"])(calcScroll);
 });
 
 /***/ }),
@@ -33728,10 +33741,11 @@ var forms = function forms(state) {
           }
 
           windows.forEach(function (item) {
-            item.style.display = ""; // удаляем модалку
-          });
-          document.body.classList.remove('modal-open'); // активируем скролл
+            item.style.display = "none"; // скрываем модалку
 
+            document.body.style.overflow = '';
+            document.body.style.marginRight = '0px'; // компенсируем скролл
+          });
           console.log("Форма отправлена.");
           console.log(state);
         }, 4000);
@@ -33753,14 +33767,16 @@ var forms = function forms(state) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-var images = function images() {
+var images = function images(calcScroll) {
   var imgPopup = document.createElement('div'),
       workSection = document.querySelector('.works'),
-      bigImage = document.createElement('img');
+      bigImage = document.createElement('img'),
+      scroll = calcScroll();
   imgPopup.classList.add('popup_img');
   workSection.append(imgPopup);
   imgPopup.style.justifyContent = 'center';
   imgPopup.style.alignItems = 'center';
+  document.body.style.overflow = '';
   imgPopup.style.display = 'none';
   imgPopup.append(bigImage);
   workSection.addEventListener('click', function (e) {
@@ -33769,16 +33785,21 @@ var images = function images() {
 
     if (target && target.classList.contains('preview')) {
       imgPopup.style.display = 'flex';
-      document.body.classList.add('modal-open');
+      document.body.style.overflow = 'hidden';
       var path = target.parentNode.getAttribute('href');
       bigImage.setAttribute('src', path);
       bigImage.style.maxWidth = '80%';
       bigImage.style.maxHeight = '70%';
+      bigImage.style.borderRadius = '10px';
+      document.body.style.marginRight = "".concat(calcScroll(), "px");
+      bigImage.classList.add('faded');
     }
 
     if (target && target.matches('div.popup_img')) {
-      imgPopup.style.display = 'none';
-      document.body.classList.remove('modal-open');
+      imgPopup.style.display = '';
+      document.body.style.overflow = '';
+      document.body.style.marginRight = '0px';
+      bigImage.classList.remove('faded');
     }
   });
 };
@@ -33803,7 +33824,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var modals = function modals(state) {
+var modals = function modals(state, calcScroll) {
   function bindModal(triggerSelector, modalSelector, closeSelector) {
     var clickCloseOverlay = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
     var trigger = document.querySelectorAll(triggerSelector),
@@ -33812,19 +33833,8 @@ var modals = function modals(state) {
         windows = document.querySelectorAll('[data-modal'),
         // все модальные окна (для закрытия всех разом)
     modalCalcValid = document.querySelector('.popup_calc_content'),
-        modalProfileValid = document.querySelector('.popup_calc_profile_content');
-
-    function closeModal() {
-      windows.forEach(function (item) {
-        item.style.display = 'none';
-      });
-    }
-
-    function openModal() {
-      modal.style.display = 'block';
-      document.body.classList.add('modal-open');
-    }
-
+        modalProfileValid = document.querySelector('.popup_calc_profile_content'),
+        scroll = calcScroll();
     trigger.forEach(function (item) {
       item.addEventListener('click', function (e) {
         if (e.target) {
@@ -33864,8 +33874,15 @@ var modals = function modals(state) {
           }
         }
 
-        closeModal();
-        openModal();
+        windows.forEach(function (item) {
+          item.style.display = 'none';
+          item.classList.remove('faded');
+        });
+        modal.style.display = 'block';
+        modal.classList.add('faded'); // modal.classList.remove('appearance');           
+
+        document.body.style.overflow = 'hidden';
+        document.body.style.marginRight = "".concat(scroll, "px");
         clearInterval(modalTimerId);
       });
     });
@@ -33874,18 +33891,22 @@ var modals = function modals(state) {
         item.style.display = 'none';
       });
       modal.style.display = 'none';
-      document.body.classList.remove('modal-open');
+      modal.classList.remove('faded'); // modal.classList.add('appearance');
+
+      document.body.style.overflow = '';
+      document.body.style.marginRight = '0px';
     });
     modal.addEventListener('click', function (e) {
       // клик на подложку модалки
       if (e.target === modal && clickCloseOverlay) {
         // если клик на подложку  && аргумент - true,
         windows.forEach(function (item) {
-          // то окно закроется
           item.style.display = 'none';
         });
         modal.style.display = 'none';
-        document.body.classList.remove('modal-open');
+        modal.classList.remove('faded');
+        document.body.style.overflow = '';
+        document.body.style.marginRight = "0px";
       }
     });
   }
@@ -33895,7 +33916,8 @@ var modals = function modals(state) {
   function showModalByTime(selector, time) {
     modalTimerId = Object(core_js__WEBPACK_IMPORTED_MODULE_1__["setTimeout"])(function () {
       document.querySelector(selector).style.display = 'block';
-      document.body.classList.add('modal-open');
+      document.body.style.overflow = 'hidden';
+      document.body.style.marginRight = "".concat(calcScroll(), "px");
     }, time);
   }
 
@@ -33933,6 +33955,7 @@ var tabs = function tabs(headerSelector, tabSelector, contentSelector, activeCla
   function hideTabContent() {
     content.forEach(function (item) {
       item.style.display = 'none';
+      item.classList.remove('faded');
     });
     tab.forEach(function (item) {
       item.classList.remove(activeClass);
@@ -33942,6 +33965,7 @@ var tabs = function tabs(headerSelector, tabSelector, contentSelector, activeCla
   function showTabContent() {
     var i = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
     content[i].style.display = display;
+    content[i].classList.add('faded');
     tab[i].classList.add(activeClass);
   }
 
